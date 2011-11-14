@@ -2,7 +2,6 @@ var poker = function() {
     var beats =
         function(obj, other) {
             if(obj.number === other.number){ return false; }
-            if(obj.number === poker.ace){ return true; }
             return obj.number > other.number;
         };
 
@@ -15,7 +14,8 @@ var poker = function() {
     };
 
     return {
-        ace: 1, jack: 11, queen: 12, king: 13,
+        highest: 0,
+        jack: 11, queen: 12, king: 13, ace: 14,
         hearts: 20, spades: 21, clubs: 22, diamonds: 23,
         highCard: 0, pair: 1, twoPair: 2, threeOfAKind: 3, straight: 4,
             flush: 5, fullHouse: 6, fourOfAKind: 7, straightFlush: 8,
@@ -52,7 +52,6 @@ poker.Hand = function() {
     c.sort(
         function(a,b) {
             if(a.number === b.number){ return 0; }
-            if(a.number === poker.ace){ return -1; }
             if(a.number < b.number){ return 1; }
             if(a.number > b.number){ return -1; }
         }
@@ -70,7 +69,7 @@ poker.Hand = function() {
     var getValue = function() {
         var i = poker.pair;
         while(i > poker.highCard){
-            if(logic[i](getGroupByNumber)){
+            if(logic[i](getGroupByNumber())){
                 return i;
             }
             i--;
@@ -100,6 +99,27 @@ poker.Hand = function() {
         return group;
     };
 
+    var beats = function(otherHand) {
+        var thisHandValue = this.getValue(),
+            otherHandValue = otherHand.getValue();
+        if (thisHandValue === poker.highCard
+            && otherHandValue === poker.highCard) {
+            return hasHighCards(this,otherHand);
+        }
+        return thisHandValue > otherHandValue;
+    };
+
+    var hasHighCards = function(thisHand,otherHand) {
+        var i = 0;
+        while(i <= thisHand.count) {
+            if (thisHand.cards[i].beats(otherHand.cards[i])) {
+                return true;
+            }
+            i++;
+        }
+        return false;
+    };
+
     if(getGroups(poker.numberAndSuitComparer).length > 0){
         throw "duplicate card not allowed";
     }
@@ -110,15 +130,7 @@ poker.Hand = function() {
     return {    
         count: c.length,
         cards: c,
-        beats: function(other){
-            var thisValue = this.getValue(),
-                otherValue = other.getValue();
-            if(thisValue === otherValue){
-                return true;
-            } else {
-                return this.cards[0].beats(other.cards[0]);
-            }
-        },
+        beats: beats,
         getValue: getValue,
         getGroupByNumber: getGroupByNumber,
         getGroupBySuit: getGroupBySuit

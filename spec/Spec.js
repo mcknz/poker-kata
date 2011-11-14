@@ -8,16 +8,19 @@ describe("Poker", function() {
     it("has hearts suit", function() {
       expect(poker.hearts).toEqual(20);
     });
-/*
+
     it("ace-high beats king-high", function() {
         expect(
-            poker.Hand(getDiamond(poker.ace),getHeart(2),getClub(5),getClub(4),getSpade(7))
-            .beats(
-                poker.Hand(getDiamond(poker.king),getHeart(2),getClub(5),getClub(4),getSpade(7))
+            poker.Hand(
+                getDiamond(poker.ace),getHeart(2),getClub(5),getClub(4),getSpade(7)
+            ).beats(
+                poker.Hand(
+                    getDiamond(poker.king),getHeart(2),getClub(5),getClub(4),getSpade(7)
+                )
             )
         ).toBeTruthy();
     });
-    */
+    
     it("king-high does not beat ace-high", function() {
         expect(
             poker.Hand(getDiamond(poker.king),getHeart(2),getClub(5),getClub(4),getSpade(7))
@@ -26,8 +29,7 @@ describe("Poker", function() {
             )
         ).toBeFalsy();
     });
-
-    /*
+/*
     it("ace-king-queen-jack-eight-high does not beat ace-king-queen-jack-nine-high hand", function() {
         expect(
             poker.Hand(getDiamond(poker.ace),getHeart(poker.king),getClub(poker.queen),getClub(poker.jack),getSpade(8))
@@ -36,7 +38,16 @@ describe("Poker", function() {
             )
         ).toBeFalsy();
     });
-  
+
+    it("ace-king-queen-jack-nine-high does not beat ace-king-queen-jack-nine-high hand", function() {
+        expect(
+            poker.Hand(getDiamond(poker.ace),getHeart(poker.king),getClub(poker.queen),getClub(poker.jack),getSpade(9))
+            .beats(
+                poker.Hand(getDiamond(poker.ace),getHeart(poker.king),getClub(poker.queen),getClub(poker.jack),getSpade(8))
+            )
+        ).toBeFalsy();
+    });
+
     it("pair beats king-high hand", function() {
         expect(
             poker.Hand(getDiamond(2),getHeart(2),getClub(5),getClub(4),getSpade(7))
@@ -95,8 +106,7 @@ describe("Card", function() {
 
 describe("Hand", function() {
     it("has five cards", function() {
-      var h = poker.Hand(getHeart(2),getHeart(3),getHeart(4),getHeart(5),getHeart(7));
-      expect(h.count).toEqual(5);
+      expect(getLowHand().count).toEqual(5);
     });
 
     it("has no more than 5 cards", function() {
@@ -118,18 +128,27 @@ describe("Hand", function() {
     });
 
     it("returns value of pair when has pair", function() {
-      var h = poker.Hand(getHeart(2),getClub(2),getHeart(4),getHeart(5),getHeart(7));
-      expect(h.getValue()).toEqual(poker.pair);
+      expect(getPair().getValue()).toEqual(poker.pair);
     });
 
-    it("has one group of two when is a pair", function() {
-      var h = poker.Hand(getHeart(2),getClub(2),getHeart(4),getHeart(5),getHeart(7));
-      var group = h.getGroupByNumber();
-      expect(group.length).toEqual(1);
+    it("has one group is a pair", function() {
+      expect(getPair().getGroupByNumber().length).toEqual(1);
+    });
+
+    it("has one subgroup of two when is a pair", function() {
+      expect(getPair().getGroupByNumber()[0].length).toEqual(2);
+    });
+
+    it("has no other groups when is a pair", function() {
+      expect(getPair().getGroupByNumber().length).toBeLessThan(2);
     });
 
 
 });
+
+function getLowHand() {
+    return poker.Hand(getHeart(2),getHeart(3),getHeart(4),getHeart(5),getHeart(7));
+}
 
 function getPair() {
     return poker.Hand(getHeart(2),getClub(2),getHeart(4),getHeart(5),getHeart(7));
