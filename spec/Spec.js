@@ -8,81 +8,71 @@ describe("Poker", function() {
     it("has hearts suit", function() {
       expect(poker.hearts).toEqual(20);
     });
-    it("ace-high hand beats king-high hand", function() {
+/*
+    it("ace-high beats king-high", function() {
         expect(
-            poker.Hand(
-                getDiamond(poker.ace),
-                getHeart(2),
-                getClub(5),
-                getClub(4),
-                getSpade(7))
+            poker.Hand(getDiamond(poker.ace),getHeart(2),getClub(5),getClub(4),getSpade(7))
             .beats(
-                poker.Hand(
-                getDiamond(poker.king),
-                getHeart(2),
-                getClub(5),
-                getClub(4),
-                getSpade(7)
+                poker.Hand(getDiamond(poker.king),getHeart(2),getClub(5),getClub(4),getSpade(7))
             )
-        )).toBeTruthy();
+        ).toBeTruthy();
+    });
+    */
+    it("king-high does not beat ace-high", function() {
+        expect(
+            poker.Hand(getDiamond(poker.king),getHeart(2),getClub(5),getClub(4),getSpade(7))
+            .beats(
+                poker.Hand(getDiamond(poker.ace),getHeart(2),getClub(5),getClub(4),getSpade(7))
+            )
+        ).toBeFalsy();
     });
 
+    /*
+    it("ace-king-queen-jack-eight-high does not beat ace-king-queen-jack-nine-high hand", function() {
+        expect(
+            poker.Hand(getDiamond(poker.ace),getHeart(poker.king),getClub(poker.queen),getClub(poker.jack),getSpade(8))
+            .beats(
+                poker.Hand(getDiamond(poker.ace),getHeart(poker.king),getClub(poker.queen),getClub(poker.jack),getSpade(9))
+            )
+        ).toBeFalsy();
+    });
+  
     it("pair beats king-high hand", function() {
         expect(
-            poker.Hand(
-                getDiamond(2),
-                getHeart(2),
-                getClub(5),
-                getClub(4),
-                getSpade(7))
+            poker.Hand(getDiamond(2),getHeart(2),getClub(5),getClub(4),getSpade(7))
             .beats(
-                poker.Hand(
-                getDiamond(poker.king),
-                getHeart(2),
-                getClub(5),
-                getClub(4),
-                getSpade(7)
+                poker.Hand(getDiamond(poker.king),getHeart(2),getClub(5),getClub(4),getSpade(7))
             )
-        )).toBeTruthy();
+        ).toBeTruthy();
     });
 
     it("pair of threes beats pair of twos", function() {
         expect(
-            poker.Hand(
-                getDiamond(2),
-                getHeart(6),
-                getClub(3),
-                getHeart(3),
-                getSpade(7))
+            poker.Hand(getDiamond(2),getHeart(6),getClub(3),getHeart(3),getSpade(7))
             .beats(
-                poker.Hand(
-                getDiamond(2),
-                getHeart(2),
-                getClub(5),
-                getClub(4),
-                getSpade(7)
+                poker.Hand(getDiamond(2),getHeart(2),getClub(5),getClub(4),getSpade(7))
             )
-        )).toBeTruthy();
+        ).toBeTruthy();
+    });
+
+    it("pair of twos does not beat pair of threes", function() {
+        expect(
+            poker.Hand(getDiamond(2),getHeart(6),getClub(2),getHeart(2),getSpade(7))
+            .beats(
+                poker.Hand(getDiamond(3),getHeart(3),getClub(5),getClub(4),getSpade(7))
+            )
+        ).toBeFalsy();
     });
 
     it("two pair of beats pair", function() {
         expect(
-            poker.Hand(
-                getDiamond(2),
-                getHeart(2),
-                getClub(8),
-                getClub(7),
-                getSpade(7))
+            poker.Hand(getDiamond(2),getHeart(2),getClub(8),getClub(7),getSpade(7))
             .beats(
-                poker.Hand(
-                getDiamond(8),
-                getHeart(8),
-                getClub(5),
-                getClub(4),
-                getSpade(7)
+                poker.Hand(getDiamond(8),getHeart(8),getClub(5),getClub(4),getSpade(7)
             )
         )).toBeTruthy();
     });
+    */
 });
 
 describe("Card", function() {
@@ -126,7 +116,24 @@ describe("Hand", function() {
           })
           .toThrow("duplicate card not allowed");
     });
+
+    it("returns value of pair when has pair", function() {
+      var h = poker.Hand(getHeart(2),getClub(2),getHeart(4),getHeart(5),getHeart(7));
+      expect(h.getValue()).toEqual(poker.pair);
+    });
+
+    it("has one group of two when is a pair", function() {
+      var h = poker.Hand(getHeart(2),getClub(2),getHeart(4),getHeart(5),getHeart(7));
+      var group = h.getGroupByNumber();
+      expect(group.length).toEqual(1);
+    });
+
+
 });
+
+function getPair() {
+    return poker.Hand(getHeart(2),getClub(2),getHeart(4),getHeart(5),getHeart(7));
+}
 
 function getHeart(val) {
     return poker.Card({'number':val,'suit':poker.hearts});

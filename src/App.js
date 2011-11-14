@@ -110,7 +110,7 @@ poker.Hand = function() {
     return {    
         count: c.length,
         cards: c,
-        beats: function (other) {
+        beats: function(other){
             var thisValue = this.getValue(),
                 otherValue = other.getValue();
             if(thisValue === otherValue){
