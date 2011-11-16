@@ -2,8 +2,12 @@ var poker = function() {
     var beats =
         function(obj, other) {
             if(obj.number === other.number){ return false; }
-            if(obj.number === poker.ace){ return true; }
             return obj.number > other.number;
+        };
+
+    var equals =
+        function(obj, other) {
+             return obj.number === other.number;
         };
 
     var suitComparer = function(obj, other) { return obj.suit === other.suit; };
@@ -15,11 +19,13 @@ var poker = function() {
     };
 
     return {
-        ace: 1, jack: 11, queen: 12, king: 13,
+        highest: 0,
+        jack: 11, queen: 12, king: 13, ace: 14,
         hearts: 20, spades: 21, clubs: 22, diamonds: 23,
         highCard: 0, pair: 1, twoPair: 2, threeOfAKind: 3, straight: 4,
             flush: 5, fullHouse: 6, fourOfAKind: 7, straightFlush: 8,
         beats: beats,
+        equals: equals,
         suitComparer: suitComparer,
         numberComparer: numberComparer,
         numberAndSuitComparer: numberAndSuitComparer
@@ -32,6 +38,9 @@ poker.Card = function(obj) {
         suit: obj.suit,
         beats: function(other) {
             return poker.beats(this,other);
+        },
+        equals: function(other) {
+            return poker.equals(this,other);
         }
     }
 };
@@ -52,7 +61,6 @@ poker.Hand = function() {
     c.sort(
         function(a,b) {
             if(a.number === b.number){ return 0; }
-            if(a.number === poker.ace){ return -1; }
             if(a.number < b.number){ return 1; }
             if(a.number > b.number){ return -1; }
         }
@@ -70,7 +78,7 @@ poker.Hand = function() {
     var getValue = function() {
         var i = poker.pair;
         while(i > poker.highCard){
-            if(logic[i](getGroupByNumber)){
+            if(logic[i](getGroupByNumber())){
                 return i;
             }
             i--;
@@ -100,6 +108,37 @@ poker.Hand = function() {
         return group;
     };
 
+    var beats = function(otherHand) {
+        var thisHandValue = this.getValue(),
+            otherHandValue = otherHand.getValue();
+        if (thisHandValue === poker.highCard
+            && otherHandValue === poker.highCard) {
+            return hasHighCards(this,otherHand);
+        }
+        return thisHandValue > otherHandValue;
+    };
+
+    var areEqual = function(thisHand, otherHand) {
+        return thisHand.cards.every(function(e,i,a){
+            return e.equals(otherHand.cards[i]);
+        });
+    };
+
+    var equals = function(otherHand){
+        return areEqual(this, otherHand);
+    };
+
+    var hasHighCards = function(thisHand,otherHand) {
+        if(areEqual(thisHand,otherHand)){
+            return false;
+        }
+        return thisHand.cards.some(
+            function(e,i,a){
+                return e.beats(otherHand.cards[i]);
+            }
+        );
+    };
+
     if(getGroups(poker.numberAndSuitComparer).length > 0){
         throw "duplicate card not allowed";
     }
@@ -110,15 +149,8 @@ poker.Hand = function() {
     return {    
         count: c.length,
         cards: c,
-        beats: function (other) {
-            var thisValue = this.getValue(),
-                otherValue = other.getValue();
-            if(thisValue === otherValue){
-                return true;
-            } else {
-                return this.cards[0].beats(other.cards[0]);
-            }
-        },
+        beats: beats,
+        equals: equals,
         getValue: getValue,
         getGroupByNumber: getGroupByNumber,
         getGroupBySuit: getGroupBySuit
