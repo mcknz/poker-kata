@@ -9,10 +9,18 @@ describe("Poker", function() {
       expect(poker.hearts).toEqual(20);
     });
 
-    it("ace-high beats king-high", function() {
+    it("equals an identical hand", function() {
+        expect(getLowHand().equals(getLowHand())).toBeTruthy();
+    });
+
+    it("does not equal another different hand", function() {
+        expect(getLowHand().equals(getLowHand())).toBeTruthy();
+    });
+
+    it("beats king-high when ace-high", function() {
         expect(
             poker.Hand(
-                getDiamond(poker.ace),getHeart(2),getClub(5),getClub(4),getSpade(7)
+                getDiamond(2),getHeart(2),getClub(poker.ace),getClub(4),getSpade(7)
             ).beats(
                 poker.Hand(
                     getDiamond(poker.king),getHeart(2),getClub(5),getClub(4),getSpade(7)
@@ -20,17 +28,17 @@ describe("Poker", function() {
             )
         ).toBeTruthy();
     });
-    
-    it("king-high does not beat ace-high", function() {
+
+    it("does not beat ace-high when king-high", function() {
         expect(
-            poker.Hand(getDiamond(poker.king),getHeart(2),getClub(5),getClub(4),getSpade(7))
+            poker.Hand(getDiamond(2),getHeart(poker.king),getClub(5),getClub(4),getSpade(7))
             .beats(
                 poker.Hand(getDiamond(poker.ace),getHeart(2),getClub(5),getClub(4),getSpade(7))
             )
         ).toBeFalsy();
     });
-/*
-    it("ace-king-queen-jack-eight-high does not beat ace-king-queen-jack-nine-high hand", function() {
+
+    it("does not beat ace-king-queen-jack-nine-high when ace-king-queen-jack-eight-high", function() {
         expect(
             poker.Hand(getDiamond(poker.ace),getHeart(poker.king),getClub(poker.queen),getClub(poker.jack),getSpade(8))
             .beats(
@@ -39,16 +47,16 @@ describe("Poker", function() {
         ).toBeFalsy();
     });
 
-    it("ace-king-queen-jack-nine-high does not beat ace-king-queen-jack-nine-high hand", function() {
+    it("beats ace-king-queen-jack-eight-high hand when ace-king-queen-jack-nine-high", function() {
         expect(
             poker.Hand(getDiamond(poker.ace),getHeart(poker.king),getClub(poker.queen),getClub(poker.jack),getSpade(9))
             .beats(
                 poker.Hand(getDiamond(poker.ace),getHeart(poker.king),getClub(poker.queen),getClub(poker.jack),getSpade(8))
             )
-        ).toBeFalsy();
+        ).toBeTruthy();
     });
 
-    it("pair beats king-high hand", function() {
+    it("beats king-high hand when pair ", function() {
         expect(
             poker.Hand(getDiamond(2),getHeart(2),getClub(5),getClub(4),getSpade(7))
             .beats(
@@ -56,7 +64,7 @@ describe("Poker", function() {
             )
         ).toBeTruthy();
     });
-
+/*
     it("pair of threes beats pair of twos", function() {
         expect(
             poker.Hand(getDiamond(2),getHeart(6),getClub(3),getHeart(3),getSpade(7))

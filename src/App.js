@@ -5,6 +5,11 @@ var poker = function() {
             return obj.number > other.number;
         };
 
+    var equals =
+        function(obj, other) {
+             return obj.number === other.number;
+        };
+
     var suitComparer = function(obj, other) { return obj.suit === other.suit; };
 
     var numberComparer = function(obj, other){ return obj.number === other.number; };
@@ -20,6 +25,7 @@ var poker = function() {
         highCard: 0, pair: 1, twoPair: 2, threeOfAKind: 3, straight: 4,
             flush: 5, fullHouse: 6, fourOfAKind: 7, straightFlush: 8,
         beats: beats,
+        equals: equals,
         suitComparer: suitComparer,
         numberComparer: numberComparer,
         numberAndSuitComparer: numberAndSuitComparer
@@ -32,6 +38,9 @@ poker.Card = function(obj) {
         suit: obj.suit,
         beats: function(other) {
             return poker.beats(this,other);
+        },
+        equals: function(other) {
+            return poker.equals(this,other);
         }
     }
 };
@@ -109,15 +118,25 @@ poker.Hand = function() {
         return thisHandValue > otherHandValue;
     };
 
+    var areEqual = function(thisHand, otherHand) {
+        return thisHand.cards.every(function(e,i,a){
+            return e.equals(otherHand.cards[i]);
+        });
+    };
+
+    var equals = function(otherHand){
+        return areEqual(this, otherHand);
+    };
+
     var hasHighCards = function(thisHand,otherHand) {
-        var i = 0;
-        while(i <= thisHand.count) {
-            if (thisHand.cards[i].beats(otherHand.cards[i])) {
-                return true;
-            }
-            i++;
+        if(areEqual(thisHand,otherHand)){
+            return false;
         }
-        return false;
+        return thisHand.cards.some(
+            function(e,i,a){
+                return e.beats(otherHand.cards[i]);
+            }
+        );
     };
 
     if(getGroups(poker.numberAndSuitComparer).length > 0){
@@ -131,6 +150,7 @@ poker.Hand = function() {
         count: c.length,
         cards: c,
         beats: beats,
+        equals: equals,
         getValue: getValue,
         getGroupByNumber: getGroupByNumber,
         getGroupBySuit: getGroupBySuit
